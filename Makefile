@@ -1,18 +1,21 @@
 # https://stackoverflow.com/a/43039679/493161
-# https://stackoverflow.com/a/58652345/493161`
-ANDROID_HOME ?= $(HOME)/Downloads/adt-bundle-linux-x86_64-20130717
-TOOLS := $(ANDROID_HOME)/sdk/tools
+# https://stackoverflow.com/a/58652345/493161
+ANDROID_HOME ?= $(HOME)/Downloads/adt-bundle-linux-x86_64-20130717/sdk
+PATH := $(ANDROID_HOME)/platform-tools:$(PATH)
+TOOLS := $(ANDROID_HOME)/tools
 ANDROID := $(TOOLS)/android
 SDKMANAGER := $(TOOLS)/bin/sdkmanager
 export
 all: gradlew
-	./$< build
+	./$< --no-daemon build
 env:
 	$@
+update: $(SDKMANAGER)
+	$< --update
 accept: $(SDKMANAGER)
 	@echo 'Review all licenses and "accept all"'
-	$< sdk
+	yes | $< --licenses
 tools: $(TOOLS)
 	ls $<
 clean:
-	rm -rf $(ANDROID_HOME)/licenses
+	rm -rf $(dir $(ANDROID_HOME))licenses
