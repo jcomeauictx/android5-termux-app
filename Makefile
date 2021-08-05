@@ -17,5 +17,3 @@ accept: $(SDKMANAGER)
 	yes | $< --licenses
 tools: $(TOOLS)
 	ls $<
-clean:
-	rm -rf $(dir $(ANDROID_HOME))licenses
