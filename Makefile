@@ -6,8 +6,24 @@ PATH := $(ANDROID_HOME)/platform-tools:$(PATH)
 TOOLS := $(ANDROID_HOME)/tools
 ANDROID := $(TOOLS)/android
 SDKMANAGER := $(TOOLS)/bin/sdkmanager
+APK := $(APPNAME).apk
+UNSIGNED := app/build/outputs/apk/release/app-release-unsigned.apk
+SIGNED := $(UNSIGNED:-unsigned.apk=-signed.apk)
+KEYS := $(HOME)/$(APPNAME)key.keystore
 export
-all: gradlew
+$(APK): $(SIGNED)
+	$(TOOLS)/zipalign \
+	 -f 4 \
+	 $< $@
+$(SIGNED): $(UNSIGNED) $(KEYS)
+	@echo Enter password as: $(APPNAME)
+	jarsigner \
+	 -verbose \
+	 -sigalg SHA1withRSA \
+	 -digestalg SHA1 \
+	 -keystore $(KEYS) \
+	 $< $@
+$(UNSIGNED): gradlew
 	./$< --no-daemon build
 env:
 	$@
