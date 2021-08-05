@@ -1,5 +1,6 @@
 # https://stackoverflow.com/a/43039679/493161
 # https://stackoverflow.com/a/58652345/493161
+APPNAME := termux
 ANDROID_HOME ?= $(HOME)/Downloads/adt-bundle-linux-x86_64-20130717/sdk
 PATH := $(ANDROID_HOME)/platform-tools:$(PATH)
 TOOLS := $(ANDROID_HOME)/tools
@@ -17,3 +18,12 @@ accept: $(SDKMANAGER)
 	yes | $< --licenses
 tools: $(TOOLS)
 	ls $<
+keys:
+	@echo Enter password as: $(APPNAME)
+	keytool \
+         -genkeypair \
+         -validity 10000 \
+         -keystore $(HOME)/$(APPNAME)key.keystore \
+         -alias $(APPNAME) \
+         -keyalg RSA \
+         -keysize 2048
