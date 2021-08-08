@@ -10,19 +10,19 @@ APK := $(APPNAME).apk
 UNSIGNED := app/build/outputs/apk/release/app-release-unsigned.apk
 SIGNED := $(UNSIGNED:-unsigned.apk=-signed.apk)
 KEYS := $(HOME)/$(APPNAME)key.keystore
+ZIPALIGN := $(shell ls $(ANDROID_HOME)/build-tools/*/zipalign | tail -n 1)
 export
 $(APK): $(SIGNED)
-	$(TOOLS)/zipalign \
-	 -f 4 \
-	 $< $@
+	$(ZIPALIGN) -f 4 $< $@
 $(SIGNED): $(UNSIGNED) $(KEYS)
+	cp -f $< $@  # jarsigner signs file "in-place"
 	@echo Enter password as: $(APPNAME)
 	jarsigner \
 	 -verbose \
 	 -sigalg SHA1withRSA \
 	 -digestalg SHA1 \
 	 -keystore $(KEYS) \
-	 $< $@
+	 $@ $(APPNAME)
 $(UNSIGNED): gradlew
 	./$< --no-daemon build
 env:
@@ -43,3 +43,5 @@ keys:
          -alias $(APPNAME) \
          -keyalg RSA \
          -keysize 2048
+install: $(SIGNED)
+	adb install $< || echo Connect one and only one Android phone >&2
